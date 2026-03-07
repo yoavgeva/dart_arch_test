@@ -1,0 +1,5 @@
+analyzer:
+  errors:
+    public_member_api_docs: ignore
+    document_ignores: ignore
+    directives_ordering: ignore

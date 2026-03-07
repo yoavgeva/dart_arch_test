@@ -1,0 +1,7 @@
+name: fixture_app
+description: Fixture package for dart_arch_test integration tests.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.11.0
