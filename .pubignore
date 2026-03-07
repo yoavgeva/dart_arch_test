@@ -1,0 +1,5 @@
+# Exclude the integration test fixture package — it is a standalone
+# Dart package used only by local tests and must not be included in
+# the published archive (its internal imports would cause pub.dev
+# validation warnings about undeclared dependencies).
+test/fixture_app/
