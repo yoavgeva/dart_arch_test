@@ -1,0 +1,20 @@
+# Dart
+.dart_tool/
+.packages
+build/
+pubspec.lock
+
+# Test fixture app generated files
+test/fixture_app/.dart_tool/
+test/fixture_app/pubspec.lock
+
+# Coverage
+coverage/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# macOS
+.DS_Store
