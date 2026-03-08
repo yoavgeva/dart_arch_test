@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.1
+
+**Bug fix:**
+
+- `Collector.buildGraph` now compiles against analyzer ≥9.0.0: switched from
+  `result.element2` (experimental in 7.x, removed in 9.x) to `result.element`
+  (deprecated in 7.x, stable in 9.x). The `// ignore: deprecated_member_use`
+  suppression keeps the code clean on both analyzer ranges.
+
 ## 0.2.0
 
 **New features:**

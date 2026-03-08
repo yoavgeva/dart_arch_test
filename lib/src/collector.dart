@@ -158,10 +158,11 @@ class Collector {
 
         if (result is! ResolvedLibraryResult) continue;
 
-        // element2 is marked @experimental in analyzer 7.x but is the correct
-        // forward-compatible API (element is @Deprecated).
-        // ignore: experimental_member_use
-        final lib = result.element2;
+        // analyzer ≥9.0: element is the stable API (element2 was removed in 9.x).
+        // LibraryElement.uri holds the canonical package: URI.
+        // importedLibraries lives on LibraryFragment (each compilation unit);
+        // we collect imports across all fragments to handle part files.
+        final lib = result.element;
 
         final callerUri = lib.uri.toString();
 
@@ -171,7 +172,7 @@ class Collector {
         graph.putIfAbsent(callerUri, LinkedHashSet.new);
 
         for (final fragment in lib.fragments) {
-          for (final imported in fragment.importedLibraries2) {
+          for (final imported in fragment.importedLibraries) {
             if (!includeSdk && imported.isInSdk) continue;
             final importedUri = imported.uri.toString();
             if (importedUri == callerUri) continue;
