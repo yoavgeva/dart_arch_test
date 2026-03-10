@@ -115,6 +115,48 @@ Future<void> main() async {
     print('✗ $e');
   }
 
+  // ─── 7. Variadic union (new in 0.3.0) ────────────────────────────────────────
+  print('\n--- variadic union ---');
+  final uiAndDomain = union(
+    filesMatching('features/**'),
+    filesMatching('domain/**'),
+    filesMatching('data/**'),
+  );
+  final resolved = uiAndDomain.resolve(graph);
+  print('✓ union of 3 selectors: ${resolved.length} libraries');
+
+  // ─── 8. difference (new in 0.3.0) ────────────────────────────────────────────
+  print('\n--- difference ---');
+  final featuresExceptAuth = difference(
+    filesMatching('features/**'),
+    filesMatching('features/auth/**'),
+  );
+  final diffResolved = featuresExceptAuth.resolve(graph);
+  print(
+    '✓ features/ minus auth/: '
+    '${diffResolved.length} libraries',
+  );
+
+  // ─── 9. except: parameter (new in 0.3.0) ─────────────────────────────────────
+  //
+  // domain/ imports data/ — normally a violation in this onion architecture.
+  // The except: parameter lets us carve out a known exception without splitting
+  // the test.
+  print('\n--- except: parameter ---');
+  try {
+    shouldNotDependOn(
+      filesMatching('domain/**'),
+      filesMatching('data/**'),
+      graph,
+      // Acknowledge the known domain→data coupling without failing the rule
+      // for any new domain file that might be added later.
+      except: filesMatching('domain/home_model.dart'),
+    );
+    print('✓ domain→data violations excluded via except:');
+  } on ArchTestFailure catch (e) {
+    print('✗ $e');
+  }
+
   print(
     '\nDone. In a real test suite every rule above lives in test() blocks.',
   );
