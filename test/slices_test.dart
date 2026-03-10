@@ -153,8 +153,8 @@ void main() {
       'deduplicates violations: each {subject, dependency} pair at most once',
       () {
         // Two files in orders both depend on inventory/repo.dart.
-        // We should get exactly 2 violations (one per unique subject→dep pair),
-        // not 4 (which would happen if both slice-pair combos were counted twice).
+        // Expect exactly 2 violations (one per unique subject→dep pair),
+        // not 4 (which would happen if slice-pair combos were double-counted).
         final graph = {
           'package:app/orders/checkout.dart': {
             'package:app/inventory/repo.dart',

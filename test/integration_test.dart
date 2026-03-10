@@ -410,8 +410,8 @@ void main() {
       () {
         // In top-to-bottom layered order: presentation > domain > data
         // domain is layer index 1; data is layer index 2 (below domain)
-        // So domain importing data is ALLOWED by enforceDirection (downward only)
-        // We use enforceOnionRules to detect domain→data as inner-to-outer violation
+        // So domain importing data is ALLOWED by enforceDirection (downward)
+        // Use enforceOnionRules to detect domain→data as inner-to-outer.
         expect(
           () => defineOnion({
             'domain': 'domain/**',
@@ -423,12 +423,12 @@ void main() {
     );
 
     test(
-      'features-only layers: home→auth is same-layer cross-feature, direction passes',
+      'features-only: home→auth same-layer cross-feature, direction passes',
       () {
-        // Only two layers: presentation and domain. home→auth is within presentation.
-        // domain→data is caught by onion but that is separate.
-        // Here we check: presentation layer does not import domain (no violation).
-        // home_provider imports domain/home_model but domain is the layer below — allowed.
+        // Two layers: presentation and domain. home→auth within presentation.
+        // domain→data is caught by onion (separate).
+        // Presentation does not import domain here (no violation).
+        // home_provider imports domain/home_model — layer below, allowed.
         expect(
           () => defineLayers({
             'presentation': 'features/**',

@@ -136,7 +136,7 @@ class Collector {
 
   /// Returns the Dart SDK path, correctly handling the `flutter test` scenario
   /// where [Platform.resolvedExecutable] is `flutter_tester` rather than
-  /// `dart`, causing [analyzer]'s default `getSdkPath()` to return the
+  /// `dart`, causing the analyzer's default `getSdkPath()` to return the
   /// wrong directory.
   ///
   /// Resolution order:
@@ -212,10 +212,10 @@ class Collector {
 
         if (result is! ResolvedLibraryResult) continue;
 
-        // analyzer ≥9.0: element is the stable API (element2 was removed in 9.x).
+        // analyzer ≥9.0: element is the stable API (element2 removed in 9.x).
         // LibraryElement.uri holds the canonical package: URI.
         // importedLibraries lives on LibraryFragment (each compilation unit);
-        // we collect imports across all fragments to handle part files.
+        // collect imports across all fragments to handle part files.
         final lib = result.element;
 
         final callerUri = lib.uri.toString();

@@ -4,6 +4,9 @@ formatter:
   page_width: 80
 
 analyzer:
+  exclude:
+    - test/fixture_app/**
+    - example/**
   language:
     strict-casts: true
     strict-inference: true

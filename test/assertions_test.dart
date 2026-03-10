@@ -32,7 +32,7 @@ void main() {
   late DependencyGraph graph;
   setUp(() => graph = _buildGraph());
 
-  // ── shouldNotDependOn ───────────────────────────────────────────────────────
+  // ── shouldNotDependOn ────────────────────────────────────────────────────
 
   group('shouldNotDependOn', () {
     test('passes when there is no dependency', () {
@@ -116,7 +116,7 @@ void main() {
     });
   });
 
-  // ── shouldOnlyDependOn ──────────────────────────────────────────────────────
+  // ── shouldOnlyDependOn ───────────────────────────────────────────────────
 
   group('shouldOnlyDependOn', () {
     test('passes when all deps are in allowed set', () {
@@ -159,7 +159,7 @@ void main() {
     });
   });
 
-  // ── shouldNotTransitivelyDependOn ───────────────────────────────────────────
+  // ── shouldNotTransitivelyDependOn ────────────────────────────────────────
 
   group('shouldNotTransitivelyDependOn', () {
     test('detects transitive dep through two hops', () {
@@ -197,7 +197,7 @@ void main() {
     });
   });
 
-  // ── shouldNotBeCalledBy ─────────────────────────────────────────────────────
+  // ── shouldNotBeCalledBy ──────────────────────────────────────────────────
 
   group('shouldNotBeCalledBy', () {
     test('fails when forbidden caller imports the object', () {
@@ -224,7 +224,7 @@ void main() {
     });
   });
 
-  // ── shouldOnlyBeCalledBy ────────────────────────────────────────────────────
+  // ── shouldOnlyBeCalledBy ─────────────────────────────────────────────────
 
   group('shouldOnlyBeCalledBy', () {
     test('passes when all callers are in the allowed set', () {
@@ -283,7 +283,7 @@ void main() {
     });
   });
 
-  // ── shouldNotExist ──────────────────────────────────────────────────────────
+  // ── shouldNotExist ───────────────────────────────────────────────────────
 
   group('shouldNotExist', () {
     test('fails when matching libraries exist', () {
@@ -316,7 +316,7 @@ void main() {
     });
   });
 
-  // ── shouldBeFreeOfCycles ────────────────────────────────────────────────────
+  // ── shouldBeFreeOfCycles ─────────────────────────────────────────────────
 
   group('shouldBeFreeOfCycles', () {
     test('passes on acyclic graph', () {
@@ -371,7 +371,7 @@ void main() {
     });
   });
 
-  // ── shouldHaveUriMatching ───────────────────────────────────────────────────
+  // ── shouldHaveUriMatching ────────────────────────────────────────────────
 
   group('shouldHaveUriMatching', () {
     test('passes when all URIs match pattern', () {

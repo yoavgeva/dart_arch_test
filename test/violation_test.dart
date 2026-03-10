@@ -48,7 +48,7 @@ void main() {
           message: 'm',
         ),
       ];
-      final e = ArchTestFailure(violations);
+      const e = ArchTestFailure(violations);
       expect(e.toString(), contains('2'));
       expect(e.toString(), contains('Architecture violations'));
     });
@@ -59,13 +59,13 @@ void main() {
         subject: 'package:app/a.dart',
         message: 'm',
       );
-      final e = ArchTestFailure(const [v]);
+      const e = ArchTestFailure([v]);
       expect(e.violations, hasLength(1));
       expect(e.violations.first, same(v));
     });
 
     test('is an Exception', () {
-      expect(ArchTestFailure(const []), isA<Exception>());
+      expect(const ArchTestFailure([]), isA<Exception>());
     });
   });
 }
