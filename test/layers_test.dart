@@ -123,16 +123,14 @@ void main() {
         // repo → web and repo → context are both violations
         expect(
           e.violations.any(
-            (v) =>
-                v.subject.contains('repo') && v.dependency!.contains('web'),
+            (v) => v.subject.contains('repo') && v.dependency!.contains('web'),
           ),
           isTrue,
         );
         expect(
           e.violations.any(
             (v) =>
-                v.subject.contains('repo') &&
-                v.dependency!.contains('context'),
+                v.subject.contains('repo') && v.dependency!.contains('context'),
           ),
           isTrue,
         );

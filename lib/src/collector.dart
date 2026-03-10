@@ -157,9 +157,11 @@ class Collector {
     for (final dir in pathDirs) {
       final candidate = p.join(dir, 'dart');
       if (File(candidate).existsSync()) {
-        final sdkPath = p.dirname(p.dirname(
-          File(candidate).resolveSymbolicLinksSync(),
-        ));
+        final sdkPath = p.dirname(
+          p.dirname(
+            File(candidate).resolveSymbolicLinksSync(),
+          ),
+        );
         if (Directory('$sdkPath/lib/_internal').existsSync()) {
           return sdkPath;
         }

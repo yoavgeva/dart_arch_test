@@ -181,7 +181,9 @@ void main() {
       });
 
       test('self-cycle produces single-element cycle', () {
-        final g = {'package:app/a.dart': {'package:app/a.dart'}};
+        final g = {
+          'package:app/a.dart': {'package:app/a.dart'},
+        };
         final cycles = Collector.cycles(g);
         expect(cycles, hasLength(1));
         expect(cycles.first, hasLength(1));
