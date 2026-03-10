@@ -63,11 +63,7 @@ export 'src/assertions.dart'
         shouldOnlyBeCalledBy,
         shouldOnlyDependOn;
 export 'src/class_matcher.dart'
-    show
-        clearContentMatcherCache,
-        extending,
-        implementing,
-        withAnnotation;
+    show clearContentMatcherCache, extending, implementing, withAnnotation;
 export 'src/collector.dart' show Collector, DependencyGraph;
 export 'src/freeze.dart' show Freeze, FreezeFailure, freeze;
 export 'src/layers.dart' show Layers, defineLayers, defineOnion;

@@ -107,16 +107,16 @@ enum _MatchMode { extending, implementing, withAnnotation }
 
 class _ClassMatchSelector implements LibrarySelector {
   _ClassMatchSelector._extending(String name)
-      : _mode = _MatchMode.extending,
-        _name = name;
+    : _mode = _MatchMode.extending,
+      _name = name;
 
   _ClassMatchSelector._implementing(String name)
-      : _mode = _MatchMode.implementing,
-        _name = name;
+    : _mode = _MatchMode.implementing,
+      _name = name;
 
   _ClassMatchSelector._withAnnotation(String name)
-      : _mode = _MatchMode.withAnnotation,
-        _name = name;
+    : _mode = _MatchMode.withAnnotation,
+      _name = name;
 
   final _MatchMode _mode;
   final String _name;
@@ -213,13 +213,11 @@ class _ClassMatchSelector implements LibrarySelector {
     return decl.metadata.any((ann) {
       final annotationName = ann.name.name;
       // Handle both 'foo' and 'prefix.foo' annotation forms
-      return annotationName == _name ||
-          annotationName.endsWith('.$_name');
+      return annotationName == _name || annotationName.endsWith('.$_name');
     });
   }
 
-  static String _namedTypeName(NamedType namedType) =>
-      namedType.name.lexeme;
+  static String _namedTypeName(NamedType namedType) => namedType.name.lexeme;
 
   static String? _uriToPath(String uri, String absRoot) {
     final match = RegExp(r'^package:[^/]+/(.+)$').firstMatch(uri);
