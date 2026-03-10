@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.2.2
+
+**Bug fix:**
+
+- Fixed `Collector.buildGraph` crashing under `flutter test` with
+  `PathNotFoundException` on `artifacts/engine/version` and
+  `lib/_internal/libraries.dart`. Under `flutter test`,
+  `Platform.resolvedExecutable` is `flutter_tester` (not `dart`), so the
+  `analyzer` package's `getSdkPath()` resolved to the wrong directory.
+  `Collector` now walks up the directory tree to find the real Dart SDK
+  (`bin/cache/dart-sdk/`) before falling back to the previous behaviour.
+
 ## 0.2.1
 
 **Bug fix:**
