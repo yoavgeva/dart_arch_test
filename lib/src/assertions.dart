@@ -25,19 +25,35 @@ class ArchTestFailure implements Exception {
 
 /// Asserts no library in [subject] directly imports any library in [object].
 ///
+/// Pass [except] to exclude a subset of [subject] from the check.
+///
 /// ```dart
-/// await filesMatching('features/home/**')
-///     .shouldNotDependOn(filesMatching('features/discover/**'), graph);
+/// shouldNotDependOn(
+///   filesMatching('features/home/**'),
+///   filesMatching('features/discover/**'),
+///   graph,
+/// );
+///
+/// // Allow one file to cross the boundary
+/// shouldNotDependOn(
+///   filesMatching('shared/**'),
+///   filesMatching('features/**'),
+///   graph,
+///   except: filesMatching('shared/guards/**'),
+/// );
 /// ```
 void shouldNotDependOn(
   LibrarySelector subject,
   LibrarySelector object,
-  DependencyGraph graph,
-) {
+  DependencyGraph graph, {
+  LibrarySelector? except,
+}) {
   final objectUris = object.resolve(graph);
+  final exceptUris = except?.resolve(graph) ?? const <String>{};
   final violations = <Violation>[];
 
   for (final lib in subject.resolve(graph)) {
+    if (exceptUris.contains(lib)) continue;
     for (final dep in Collector.dependenciesOf(graph, lib)) {
       if (objectUris.contains(dep)) {
         violations.add(
@@ -57,16 +73,21 @@ void shouldNotDependOn(
 
 /// Asserts libraries in [subject] only import libraries in [allowed]
 /// (plus SDK and other out-of-scope libraries).
+///
+/// Pass [except] to exclude a subset of [subject] from the check.
 void shouldOnlyDependOn(
   LibrarySelector subject,
   LibrarySelector allowed,
-  DependencyGraph graph,
-) {
+  DependencyGraph graph, {
+  LibrarySelector? except,
+}) {
   final allowedUris = allowed.resolve(graph);
   final subjectUris = subject.resolve(graph);
+  final exceptUris = except?.resolve(graph) ?? const <String>{};
   final violations = <Violation>[];
 
   for (final lib in subjectUris) {
+    if (exceptUris.contains(lib)) continue;
     for (final dep in Collector.dependenciesOf(graph, lib)) {
       // Only check deps that are in the graph (i.e., in the project)
       if (graph.containsKey(dep) &&
@@ -89,24 +110,32 @@ void shouldOnlyDependOn(
 
 /// Asserts that no library in [callers] directly imports any library in
 /// [object].
+///
+/// Pass [except] to exclude a subset of [callers] from the check.
 void shouldNotBeCalledBy(
   LibrarySelector object,
   LibrarySelector callers,
-  DependencyGraph graph,
-) => shouldNotDependOn(callers, object, graph);
+  DependencyGraph graph, {
+  LibrarySelector? except,
+}) => shouldNotDependOn(callers, object, graph, except: except);
 
 /// Asserts that only libraries in [allowedCallers] import libraries in
 /// [object].
+///
+/// Pass [except] to exclude a subset of [object] from the check.
 void shouldOnlyBeCalledBy(
   LibrarySelector object,
   LibrarySelector allowedCallers,
-  DependencyGraph graph,
-) {
+  DependencyGraph graph, {
+  LibrarySelector? except,
+}) {
   final objectUris = object.resolve(graph);
   final allowedUris = allowedCallers.resolve(graph);
+  final exceptUris = except?.resolve(graph) ?? const <String>{};
   final violations = <Violation>[];
 
   for (final lib in objectUris) {
+    if (exceptUris.contains(lib)) continue;
     for (final caller in Collector.dependentsOf(graph, lib)) {
       if (!allowedUris.contains(caller)) {
         violations.add(
@@ -125,15 +154,37 @@ void shouldOnlyBeCalledBy(
 }
 
 /// Asserts no transitive dependency from [subject] to any library in [object].
+///
+/// Pass [except] to exclude a subset of [subject] from the check.
+///
+/// ```dart
+/// // shared/services must not (even transitively) depend on shared/widgets
+/// shouldNotTransitivelyDependOn(
+///   filesMatching('shared/services/**'),
+///   filesMatching('shared/widgets/**'),
+///   graph,
+/// );
+///
+/// // … but exclude one known bridge file
+/// shouldNotTransitivelyDependOn(
+///   filesMatching('shared/services/**'),
+///   filesMatching('shared/widgets/**'),
+///   graph,
+///   except: filesMatching('shared/services/share_service.dart'),
+/// );
+/// ```
 void shouldNotTransitivelyDependOn(
   LibrarySelector subject,
   LibrarySelector object,
-  DependencyGraph graph,
-) {
+  DependencyGraph graph, {
+  LibrarySelector? except,
+}) {
   final objectUris = object.resolve(graph);
+  final exceptUris = except?.resolve(graph) ?? const <String>{};
   final violations = <Violation>[];
 
   for (final lib in subject.resolve(graph)) {
+    if (exceptUris.contains(lib)) continue;
     final transitive = Collector.transitiveDependenciesOf(graph, lib);
     for (final dep in transitive) {
       if (objectUris.contains(dep)) {

@@ -62,6 +62,12 @@ export 'src/assertions.dart'
         shouldNotTransitivelyDependOn,
         shouldOnlyBeCalledBy,
         shouldOnlyDependOn;
+export 'src/class_matcher.dart'
+    show
+        clearContentMatcherCache,
+        extending,
+        implementing,
+        withAnnotation;
 export 'src/collector.dart' show Collector, DependencyGraph;
 export 'src/freeze.dart' show Freeze, FreezeFailure, freeze;
 export 'src/layers.dart' show Layers, defineLayers, defineOnion;
@@ -70,6 +76,7 @@ export 'src/library_set.dart'
         LibrarySelector,
         LibrarySet,
         allFiles,
+        difference,
         filesMatching,
         intersection,
         union;

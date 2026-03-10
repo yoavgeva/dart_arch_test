@@ -145,6 +145,10 @@ class Collector {
   ///   3. Flutter SDK dart-sdk: walk up from `flutter_tester` to find
   ///      `bin/cache/dart-sdk` by looking for a `lib/_internal` sibling.
   ///   4. Fall back to the default `getSdkPath()` behaviour.
+  /// Public so that other components (e.g. content-based selectors) can reuse
+  /// the same SDK resolution logic.
+  static String resolveDartSdkPath() => _resolveDartSdkPath();
+
   static String _resolveDartSdkPath() {
     // 1. Explicit override.
     final envSdk = Platform.environment['DART_SDK'];

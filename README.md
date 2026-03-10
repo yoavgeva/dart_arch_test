@@ -45,6 +45,9 @@ Large Flutter projects rot in a predictable way: a `HomeProvider` quietly import
 - **Existence rules** — `shouldNotExist`, `shouldHaveUriMatching`
 - **Coupling metrics** — `Metrics.coupling`, `Metrics.instability`, `Metrics.martin` (Robert C. Martin's Ca/Ce/instability/distance)
 - **Violation freeze** — `freeze(ruleId, () { ... })` baselines known violations so new ones cause failures in CI
+- **`except:` on all assertions** — carve out exceptions without splitting tests
+- **Set algebra** — `union(a, b, c, d)` (variadic), `intersection(a, b)`, `difference(a, b)`
+- **Content-based selectors** — `extending`, `implementing`, `withAnnotation` (select by class declaration)
 - **Glob patterns** — `**` for any depth, `*` for single segment, works with `package:` URIs
 - **Fast** — caches the analyzer graph; subsequent assertions in the same test run are free
 
@@ -54,7 +57,7 @@ Large Flutter projects rot in a predictable way: a `HomeProvider` quietly import
 
 ```yaml
 dev_dependencies:
-  dart_arch_test: ^0.2.0
+  dart_arch_test: ^0.3.0
 ```
 
 ```sh
@@ -251,19 +254,89 @@ Use `filesMatching(pattern)` to select libraries by glob pattern:
 
 Patterns match against the part of the URI after `package:my_app/`, so you never need to include the package prefix.
 
-**Composition:**
+**Set algebra:**
 
 ```dart
-// Union
-final uiLibs = filesMatching('features/**').unionWith(filesMatching('widgets/**'));
+// Union — 2 to 5 selectors (variadic)
+union(filesMatching('features/**'), filesMatching('shared/**'))
+union(filesMatching('a/**'), filesMatching('b/**'), filesMatching('c/**'))
 
-// Exclusion
+// Difference — libraries in a but not in b
+difference(filesMatching('features/**'), filesMatching('features/**/*.g.dart'))
+
+// Intersection
+intersection(filesMatching('features/**'), filesMatching('**/*Screen.dart'))
+
+// Exclusion (single set)
 filesMatching('features/**').excluding('features/auth/**')
 
-// Top-level helpers
-union(filesMatching('features/**'), filesMatching('widgets/**'))
-intersection(filesMatching('features/**'), filesMatching('**/*Screen.dart'))
+// Method-chaining union
+filesMatching('features/**').unionWith(filesMatching('widgets/**'))
 ```
+
+### Content-based selectors
+
+Select libraries by what their classes declare rather than (or combined with) their path:
+
+```dart
+// Libraries containing a class that extends ChangeNotifier
+extending('ChangeNotifier')
+
+// Libraries containing a class that implements Repository
+implementing('Repository')
+
+// Libraries with any top-level @immutable annotation
+withAnnotation('immutable')
+```
+
+These can be combined with path selectors and passed to any assertion:
+
+```dart
+// ChangeNotifier subclasses must live in a providers/ folder
+test('ChangeNotifier subclasses must be in providers/', () {
+  shouldHaveUriMatching(extending('ChangeNotifier'), '**/providers/**', graph);
+});
+
+// Only shared/ may implement UnreadCountSource
+test('UnreadCountSource impls must stay in shared/', () {
+  shouldHaveUriMatching(implementing('UnreadCountSource'), 'shared/**', graph);
+});
+
+// @immutable models must not import services
+test('@immutable types must not depend on services', () {
+  shouldNotTransitivelyDependOn(
+    withAnnotation('immutable'),
+    filesMatching('**/services/**'),
+    graph,
+  );
+});
+```
+
+> **Root path detection**: content-based selectors walk up from the current working directory to find `pubspec.yaml`. Override by setting the `DART_ARCH_TEST_ROOT` environment variable.
+
+### `except:` parameter
+
+All assertion functions accept an optional `except:` parameter to carve out known exceptions without splitting the test:
+
+```dart
+// shared/ must not import features/ — except guards (bridge by design)
+shouldNotDependOn(
+  filesMatching('shared/**'),
+  filesMatching('features/**'),
+  graph,
+  except: filesMatching('shared/guards/**'),
+);
+
+// Transitive version
+shouldNotTransitivelyDependOn(
+  filesMatching('shared/services/**'),
+  filesMatching('shared/widgets/**'),
+  graph,
+  except: filesMatching('shared/services/share_service.dart'),
+);
+```
+
+Supported on: `shouldNotDependOn`, `shouldOnlyDependOn`, `shouldNotTransitivelyDependOn`, `shouldNotBeCalledBy`, `shouldOnlyBeCalledBy`.
 
 ---
 

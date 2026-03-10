@@ -1,5 +1,52 @@
 # Changelog
 
+## 0.3.0
+
+**New features:**
+
+- **Variadic `union()`** — now accepts 2–5 selectors instead of exactly 2, eliminating the need for deep nesting:
+  ```dart
+  // Before (0.2.x)
+  union(a, union(b, union(c, d)))
+  // Now
+  union(a, b, c, d)
+  ```
+
+- **`difference(a, b)`** — new top-level set operation returning libraries in `a` but not in `b`:
+  ```dart
+  // All feature files except generated code
+  difference(filesMatching('features/**'), filesMatching('features/**/*.g.dart'))
+  ```
+
+- **`except:` parameter on all assertion functions** — exclude a subset of subjects from a rule without splitting it into two tests:
+  ```dart
+  shouldNotDependOn(
+    filesMatching('shared/**'),
+    filesMatching('features/**'),
+    graph,
+    except: filesMatching('shared/guards/**'),   // guards are a bridge by design
+  );
+  shouldNotTransitivelyDependOn(subject, object, graph, except: filesMatching('...'));
+  shouldOnlyDependOn(subject, allowed, graph, except: filesMatching('...'));
+  shouldNotBeCalledBy(object, callers, graph, except: filesMatching('...'));
+  shouldOnlyBeCalledBy(object, allowed, graph, except: filesMatching('...'));
+  ```
+
+- **Content-based selectors** (`extending`, `implementing`, `withAnnotation`) — select libraries by what their classes declare, not just by file path:
+  ```dart
+  // Every ChangeNotifier subclass must live in a providers/ folder
+  shouldHaveUriMatching(extending('ChangeNotifier'), '**/providers/**', graph);
+
+  // UnreadCountSource implementations must stay in shared/
+  shouldNotDependOn(implementing('UnreadCountSource'), filesMatching('features/**'), graph);
+
+  // @immutable models must not import services
+  shouldNotTransitivelyDependOn(withAnnotation('immutable'), filesMatching('**/services/**'), graph);
+  ```
+  Root path is inferred from the nearest `pubspec.yaml` walking up from CWD, or overridden via the `DART_ARCH_TEST_ROOT` environment variable.
+
+**Exports:** `difference`, `extending`, `implementing`, `withAnnotation` are now exported from `package:dart_arch_test/dart_arch_test.dart`.
+
 ## 0.2.2
 
 **Bug fix:**

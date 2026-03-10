@@ -83,6 +83,20 @@ class _IntersectionSet implements LibrarySelector {
   }
 }
 
+/// Difference of two selectors: libraries in [_a] that are not in [_b].
+class _DifferenceSet implements LibrarySelector {
+  _DifferenceSet(this._a, this._b);
+
+  final LibrarySelector _a;
+  final LibrarySelector _b;
+
+  @override
+  Set<String> resolve(DependencyGraph graph) {
+    final bSet = _b.resolve(graph);
+    return _a.resolve(graph).where((uri) => !bSet.contains(uri)).toSet();
+  }
+}
+
 /// Convenience top-level functions mirroring the Elixir DSL.
 
 /// Returns a [LibrarySet] for files matching [pattern].
@@ -96,9 +110,41 @@ LibrarySet filesMatching(String pattern) => LibrarySet.matching(pattern);
 /// Returns a [LibrarySet] matching all libraries in the graph.
 LibrarySet allFiles() => LibrarySet.all();
 
-/// Returns a [LibrarySelector] that is the union of [a] and [b].
-LibrarySelector union(LibrarySelector a, LibrarySelector b) => _UnionSet(a, b);
+/// Returns a [LibrarySelector] that is the union of two or more selectors.
+///
+/// Accepts 2 to 5 selectors. For more, chain multiple [union] calls or use
+/// [LibrarySet.unionWith].
+///
+/// ```dart
+/// // Two selectors
+/// union(filesMatching('features/**'), filesMatching('shared/**'))
+///
+/// // Three selectors
+/// union(filesMatching('a/**'), filesMatching('b/**'), filesMatching('c/**'))
+/// ```
+LibrarySelector union(
+  LibrarySelector a,
+  LibrarySelector b, [
+  LibrarySelector? c,
+  LibrarySelector? d,
+  LibrarySelector? e,
+]) {
+  LibrarySelector result = _UnionSet(a, b);
+  if (c != null) result = _UnionSet(result, c);
+  if (d != null) result = _UnionSet(result, d);
+  if (e != null) result = _UnionSet(result, e);
+  return result;
+}
 
 /// Returns a [LibrarySelector] that is the intersection of [a] and [b].
 LibrarySelector intersection(LibrarySelector a, LibrarySelector b) =>
     _IntersectionSet(a, b);
+
+/// Returns a [LibrarySelector] containing libraries in [a] but not in [b].
+///
+/// ```dart
+/// // All feature files except generated ones
+/// difference(filesMatching('features/**'), filesMatching('features/**/*.g.dart'))
+/// ```
+LibrarySelector difference(LibrarySelector a, LibrarySelector b) =>
+    _DifferenceSet(a, b);
