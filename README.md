@@ -1,5 +1,6 @@
 # dart_arch_test
 
+[![CI](https://github.com/yoavgeva/dart_arch_test/actions/workflows/ci.yaml/badge.svg)](https://github.com/yoavgeva/dart_arch_test/actions/workflows/ci.yaml)
 [![pub package](https://img.shields.io/pub/v/dart_arch_test.svg)](https://pub.dev/packages/dart_arch_test)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![style: very good analysis](https://img.shields.io/badge/style-very_good_analysis-B22C89.svg)](https://pub.dev/packages/very_good_analysis)
