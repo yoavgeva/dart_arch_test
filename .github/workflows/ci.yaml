@@ -19,7 +19,9 @@ jobs:
           sdk: stable
 
       - name: Install dependencies
-        run: dart pub get
+        run: |
+          dart pub get
+          dart pub get --directory test/fixture_app
 
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .
