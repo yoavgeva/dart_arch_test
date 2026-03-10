@@ -134,6 +134,57 @@ class Collector {
 
   // ── private ──────────────────────────────────────────────────────────────
 
+  /// Returns the Dart SDK path, correctly handling the `flutter test` scenario
+  /// where [Platform.resolvedExecutable] is `flutter_tester` rather than
+  /// `dart`, causing [analyzer]'s default `getSdkPath()` to return the
+  /// wrong directory.
+  ///
+  /// Resolution order:
+  ///   1. `DART_SDK` environment variable (explicit override).
+  ///   2. `dart` on PATH (resolves symlinks).
+  ///   3. Flutter SDK dart-sdk: walk up from `flutter_tester` to find
+  ///      `bin/cache/dart-sdk` by looking for a `lib/_internal` sibling.
+  ///   4. Fall back to the default `getSdkPath()` behaviour.
+  static String _resolveDartSdkPath() {
+    // 1. Explicit override.
+    final envSdk = Platform.environment['DART_SDK'];
+    if (envSdk != null && Directory('$envSdk/lib/_internal').existsSync()) {
+      return envSdk;
+    }
+
+    // 2. `dart` on PATH.
+    final pathDirs = (Platform.environment['PATH'] ?? '').split(':');
+    for (final dir in pathDirs) {
+      final candidate = p.join(dir, 'dart');
+      if (File(candidate).existsSync()) {
+        final sdkPath = p.dirname(p.dirname(
+          File(candidate).resolveSymbolicLinksSync(),
+        ));
+        if (Directory('$sdkPath/lib/_internal').existsSync()) {
+          return sdkPath;
+        }
+      }
+    }
+
+    // 3. Walk up from Platform.resolvedExecutable to find dart-sdk.
+    //    Under `flutter test`, the executable is flutter_tester inside
+    //    .../bin/cache/artifacts/engine/<platform>/flutter_tester.
+    //    The dart-sdk lives at .../bin/cache/dart-sdk.
+    var dir = File(Platform.resolvedExecutable).parent;
+    for (var i = 0; i < 8; i++) {
+      final candidate = p.join(dir.path, 'dart-sdk');
+      if (Directory('$candidate/lib/_internal').existsSync()) {
+        return candidate;
+      }
+      final parent = dir.parent;
+      if (parent.path == dir.path) break;
+      dir = parent;
+    }
+
+    // 4. Default (works when running with `dart test` directly).
+    return p.dirname(p.dirname(Platform.resolvedExecutable));
+  }
+
   static Future<DependencyGraph> _build(
     String rootPath, {
     required bool includeSdk,
@@ -145,6 +196,7 @@ class Collector {
 
     final collection = AnalysisContextCollection(
       includedPaths: [absRoot],
+      sdkPath: _resolveDartSdkPath(),
       resourceProvider: PhysicalResourceProvider.INSTANCE,
     );
 

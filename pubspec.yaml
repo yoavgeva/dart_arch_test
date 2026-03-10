@@ -3,7 +3,7 @@ description: >-
   ArchUnit-inspired architecture testing for Dart & Flutter. Enforce
   layer boundaries, slice isolation, cycles, coupling metrics, and
   violation baselines — all in plain Dart tests.
-version: 0.2.1
+version: 0.2.2
 repository: https://github.com/yoavgeva/dart_arch_test
 issue_tracker: https://github.com/yoavgeva/dart_arch_test/issues
 
