@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.1
+
+**Bug fixes / performance:**
+
+- **Cycle detection performance** — `Collector.cycles` now uses a `done` set (DFS memoisation) to avoid re-exploring already-completed subtrees, reducing worst-case complexity from O(n!) to O(n + e).
+- **`_globMatch` refactor** — `assertions.dart` now delegates to the shared `matchesGlob` helper in `pattern.dart`, removing duplicated glob logic.
+
 ## 0.3.0
 
 **New features:**

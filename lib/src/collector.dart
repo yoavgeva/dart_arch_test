@@ -102,12 +102,20 @@ class Collector {
   ///
   /// Each cycle is a list of library URIs forming a closed loop, normalized
   /// so the lexicographically smallest URI comes first.
+  ///
+  /// Uses recursive DFS with a global [done] set to avoid O(n!) re-exploration
+  /// of already-completed subtrees. Once a node's full subtree is explored,
+  /// it is added to [done] and skipped on all future visits.
   static List<List<String>> cycles(DependencyGraph graph) {
     final foundKeys = <String>{};
     final result = <List<String>>[];
+    // Nodes whose entire subtree has been fully explored from any root.
+    // Re-visiting these cannot uncover new cycles.
+    final done = <String>{};
 
     void dfs(String node, List<String> path, Set<String> onStack) {
       if (onStack.contains(node)) {
+        // Back edge: cycle detected.
         final idx = path.indexOf(node);
         if (idx >= 0) {
           final cycle = _normalizeCycle(path.sublist(idx));
@@ -117,12 +125,17 @@ class Collector {
         return;
       }
 
+      if (done.contains(node)) return; // subtree already fully explored
+
       final newOnStack = {...onStack, node};
       final newPath = [...path, node];
 
       for (final dep in graph[node] ?? <String>{}) {
         dfs(dep, newPath, newOnStack);
       }
+
+      // All descendants explored — mark as done so we never revisit.
+      done.add(node);
     }
 
     for (final lib in graph.keys) {

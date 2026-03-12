@@ -6,6 +6,7 @@ library;
 
 import 'package:dart_arch_test/src/collector.dart';
 import 'package:dart_arch_test/src/library_set.dart';
+import 'package:dart_arch_test/src/pattern.dart';
 import 'package:dart_arch_test/src/violation.dart';
 
 /// Thrown when one or more architecture violations are found.
@@ -275,12 +276,4 @@ void _assertNone(List<Violation> violations) {
   throw ArchTestFailure(violations);
 }
 
-bool _globMatch(String pattern, String value) {
-  // Delegate to the pattern module; import is added as a part import below.
-  // We inline here to avoid circular imports.
-  final escaped = RegExp.escape(
-    pattern,
-  ).replaceAll(r'\*\*', '.*').replaceAll(r'\*', '[^/]*');
-  final regexStr = '^$escaped\$';
-  return RegExp(regexStr).hasMatch(value);
-}
+bool _globMatch(String pattern, String value) => matchesGlob(pattern, value);

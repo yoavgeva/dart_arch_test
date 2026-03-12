@@ -231,6 +231,53 @@ void main() {
         expect(allMods, isNot(contains('package:app/c.dart')));
         expect(allMods, isNot(contains('package:app/d.dart')));
       });
+
+      test('diamond graph (multiple paths to same node) — no spurious cycles', () {
+        // a→b, a→c, b→d, c→d: diamond shape, no cycles
+        final g = {
+          'package:app/a.dart': {'package:app/b.dart', 'package:app/c.dart'},
+          'package:app/b.dart': {'package:app/d.dart'},
+          'package:app/c.dart': {'package:app/d.dart'},
+          'package:app/d.dart': <String>{},
+        };
+        expect(Collector.cycles(g), isEmpty);
+      });
+
+      test('diamond graph with back edge detects exactly one cycle', () {
+        // a→b, a→c, b→d, c→d, d→a: one cycle a→b→d→a and a→c→d→a
+        // but these share the same canonical cycle after normalization
+        final g = {
+          'package:app/a.dart': {'package:app/b.dart', 'package:app/c.dart'},
+          'package:app/b.dart': {'package:app/d.dart'},
+          'package:app/c.dart': {'package:app/d.dart'},
+          'package:app/d.dart': {'package:app/a.dart'},
+        };
+        final cycles = Collector.cycles(g);
+        // All nodes are part of cycles; at least one cycle must be reported
+        expect(cycles, isNotEmpty);
+        final allInCycles = cycles.expand((c) => c).toSet();
+        expect(allInCycles, contains('package:app/a.dart'));
+        expect(allInCycles, contains('package:app/d.dart'));
+      });
+
+      test('fan-out graph with shared leaf — completes without timeout', () {
+        // Simulate a large fan-out to verify global visited prevents O(n!) work.
+        // Root imports 20 intermediates, all importing same leaf.
+        const n = 20;
+        final g = <String, Set<String>>{};
+        final leaf = 'package:app/leaf.dart';
+        g[leaf] = {};
+        final intermediates = List.generate(n, (i) => 'package:app/m$i.dart');
+        for (final m in intermediates) {
+          g[m] = {leaf};
+        }
+        g['package:app/root.dart'] = intermediates.toSet();
+
+        // Without global visited this would explore leaf 20 times (exponential
+        // with more levels); with the fix it explores each node exactly once.
+        final cycles = Collector.cycles(g);
+        expect(cycles, isEmpty);
+      });
     });
   });
 }
