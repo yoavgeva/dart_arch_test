@@ -103,9 +103,9 @@ class Collector {
   /// Each cycle is a list of library URIs forming a closed loop, normalized
   /// so the lexicographically smallest URI comes first.
   ///
-  /// Uses recursive DFS with a global [done] set to avoid O(n!) re-exploration
+  /// Uses recursive DFS with a global visited set to avoid O(n!) re-exploration
   /// of already-completed subtrees. Once a node's full subtree is explored,
-  /// it is added to [done] and skipped on all future visits.
+  /// it is marked done and skipped on all future visits.
   static List<List<String>> cycles(DependencyGraph graph) {
     final foundKeys = <String>{};
     final result = <List<String>>[];

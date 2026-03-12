@@ -264,11 +264,12 @@ void main() {
       });
 
       test('fan-out graph with shared leaf — completes without timeout', () {
-        // Simulate a large fan-out to verify global visited prevents O(n!) work.
+        // Simulate a large fan-out to verify global visited prevents
+        // O(n!) work.
         // Root imports 20 intermediates, all importing same leaf.
         const n = 20;
         final g = <String, Set<String>>{};
-        final leaf = 'package:app/leaf.dart';
+        const leaf = 'package:app/leaf.dart';
         g[leaf] = {};
         final intermediates = List.generate(n, (i) => 'package:app/m$i.dart');
         for (final m in intermediates) {
