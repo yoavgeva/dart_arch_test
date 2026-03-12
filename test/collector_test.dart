@@ -232,16 +232,19 @@ void main() {
         expect(allMods, isNot(contains('package:app/d.dart')));
       });
 
-      test('diamond graph (multiple paths to same node) — no spurious cycles', () {
-        // a→b, a→c, b→d, c→d: diamond shape, no cycles
-        final g = {
-          'package:app/a.dart': {'package:app/b.dart', 'package:app/c.dart'},
-          'package:app/b.dart': {'package:app/d.dart'},
-          'package:app/c.dart': {'package:app/d.dart'},
-          'package:app/d.dart': <String>{},
-        };
-        expect(Collector.cycles(g), isEmpty);
-      });
+      test(
+        'diamond graph (multiple paths to same node) — no spurious cycles',
+        () {
+          // a→b, a→c, b→d, c→d: diamond shape, no cycles
+          final g = {
+            'package:app/a.dart': {'package:app/b.dart', 'package:app/c.dart'},
+            'package:app/b.dart': {'package:app/d.dart'},
+            'package:app/c.dart': {'package:app/d.dart'},
+            'package:app/d.dart': <String>{},
+          };
+          expect(Collector.cycles(g), isEmpty);
+        },
+      );
 
       test('diamond graph with back edge detects exactly one cycle', () {
         // a→b, a→c, b→d, c→d, d→a: one cycle a→b→d→a and a→c→d→a

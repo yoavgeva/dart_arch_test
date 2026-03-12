@@ -397,17 +397,20 @@ void main() {
       );
     });
 
-    test('pattern without package prefix is normalized and matches correctly', () {
-      // Real usage: enforce _screen.dart naming without specifying package name
-      expect(
-        () => shouldHaveUriMatching(
-          filesMatching('features/**/*_screen.dart'),
-          '**/*_screen.dart',
-          graph,
-        ),
-        returnsNormally,
-      );
-    });
+    test(
+      'pattern without package prefix is normalized and matches correctly',
+      () {
+        // Real usage: enforce _screen.dart naming without specifying package name
+        expect(
+          () => shouldHaveUriMatching(
+            filesMatching('features/**/*_screen.dart'),
+            '**/*_screen.dart',
+            graph,
+          ),
+          returnsNormally,
+        );
+      },
+    );
 
     test('pattern without package prefix rejects non-matching URI', () {
       // auth_screen.dart exists; home_provider.dart does NOT end in _screen.dart
