@@ -57,7 +57,7 @@ Large Flutter projects rot in a predictable way: a `HomeProvider` quietly import
 
 ```yaml
 dev_dependencies:
-  dart_arch_test: ^0.3.0
+  dart_arch_test: ^0.3.1
 ```
 
 ```sh
